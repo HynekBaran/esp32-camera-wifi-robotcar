@@ -5,17 +5,15 @@
 
 // Board: ESP32 / AI_THINKER ESP32-CAM
 
+// Works also with generic ESP32 module (without video)
+
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <ArduinoOTA.h>
 
 /* Wifi Crdentials */
-//String sta_ssid = "$your_ssid_maximum_32_characters";     // set Wifi network you want to connect to
-//String sta_password = "$your_pswd_maximum_32_characters";   // set password for Wifi network
-
-String sta_ssid = "D-Link_DIR-600M";     // set Wifi network you want to connect to
-String sta_password = "56781234";   // set password for Wifi network
-
+String sta_ssid = "FatManD";     // set Wifi network you want to connect to
+String sta_password = "kakadubkorela";   // set password for Wifi network
 
 /* define CAMERA_MODEL_AI_THINKER */
 #define PWDN_GPIO_NUM     32
@@ -73,7 +71,7 @@ void setup() {
   pinMode(DRV_B, OUTPUT);
   pinMode(DIR_A, OUTPUT);
   pinMode(DIR_B, OUTPUT);
-  
+
   pinMode(ledPin, OUTPUT); // set the LED pin as an Output
   pinMode(buzzerPin, OUTPUT); // set the buzzer pin as an Output
   pinMode(servoPin, OUTPUT); // set the servo pin as an Output
@@ -90,7 +88,7 @@ void setup() {
   /* Initializing Servo and LED */
   initServo();
   initLed();
-  
+
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -113,7 +111,7 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   //init with high specs to pre-allocate larger buffers
-  if(psramFound()){
+  if (psramFound()) {
     config.frame_size = FRAMESIZE_UXGA;
     config.jpeg_quality = 10;
     config.fb_count = 2;
@@ -124,23 +122,23 @@ void setup() {
   }
 
   // camera init
-  esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK) {
-    Serial.printf("Camera init failed with error 0x%x", err);
-    return;
+  esp_err_t cam_err = esp_camera_init(&config);
+  if (cam_err != ESP_OK) {
+    // camera not available, lets continue without it...
+    Serial.printf("esp_camera init failed with error 0x%x.\n", cam_err);
+  } else {
+    // drop down frame size for higher initial frame rate
+    sensor_t * s = esp_camera_sensor_get();
+    s->set_framesize(s, FRAMESIZE_QVGA);
   }
-
-  //drop down frame size for higher initial frame rate
-  sensor_t * s = esp_camera_sensor_get();
-  s->set_framesize(s, FRAMESIZE_QVGA);
 
   // Set NodeMCU Wifi hostname based on chip mac address
   char chip_id[15];
-  snprintf(chip_id, 15, "%04X", (uint16_t)(ESP.getEfuseMac()>>32));
+  snprintf(chip_id, 15, "%04X", (uint16_t)(ESP.getEfuseMac() >> 32));
   String hostname = "esp32cam-" + String(chip_id);
 
   Serial.println();
-  Serial.println("Hostname: "+hostname);
+  Serial.println("Hostname: " + hostname);
 
   // first, set NodeMCU as STA mode to connect with a Wifi network
   WiFi.mode(WIFI_STA);
@@ -166,7 +164,7 @@ void setup() {
     Serial.println("");
     Serial.println("*WiFi-STA-Mode*");
     Serial.print("IP: ");
-    myIP=WiFi.localIP();
+    myIP = WiFi.localIP();
     Serial.println(myIP);
     delay(2000);
   } else {
@@ -182,11 +180,12 @@ void setup() {
     delay(2000);
   }
 
-  // Start camera server to get realtime view
+  // Start camera web server to get realtime view and react to commands
   startCameraServer();
   Serial.print("Camera Ready! Use 'http://");
   Serial.print(myIP);
   Serial.println("' to connect ");
+
 
   ArduinoOTA.begin();   // enable to receive update/upload firmware via Wifi OTA
 }
