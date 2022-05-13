@@ -1,0 +1,13 @@
+# ESP32CAM OTA 
+# ESP33_CAM (AI_THINKER ESP32-CAM) OTA support
+# boards.local.txt
+# to be but to the same directory as boards.txt
+#  ~/Library/Arduino15/packages/esp32/hardware/esp32/1.0.6/boards.local.txt
+# (follow More preferences... link in Arduino Preferences/Settings window to find proper location)
+
+esp32cam.menu.PartitionScheme.huge_app=Huge APP (3MB No OTA/1MB SPIFFS)
+esp32cam.menu.PartitionScheme.huge_app.build.partitions=huge_app
+esp32cam.menu.PartitionScheme.huge_app.upload.maximum_size=3145728
+esp32cam.menu.PartitionScheme.min_spiffs=Minimal SPIFFS (Large APPS with OTA)
+esp32cam.menu.PartitionScheme.min_spiffs.build.partitions=min_spiffs
+esp32cam.menu.PartitionScheme.min_spiffs.upload.maximum_size=1966080

@@ -7,6 +7,22 @@
 
 // Works also with generic ESP32 module (without video)
 
+// OTA: 
+// Partition scheme Minimal SPIFFS (Large APPS with OTA)
+// add the code bellow to the file 
+// boards.local.txt
+// in the same dir as boards.txt, probably ~/Library/Arduino15/packages/esp32/hardware/esp32/1.0.6/boards.local.txt
+// (follow More preferences... link in Arduino Preferences/Settings window to find proper location)
+//    esp32cam.menu.PartitionScheme.huge_app=Huge APP (3MB No OTA/1MB SPIFFS)
+//    esp32cam.menu.PartitionScheme.huge_app.build.partitions=huge_app
+//    esp32cam.menu.PartitionScheme.huge_app.upload.maximum_size=3145728
+//    esp32cam.menu.PartitionScheme.min_spiffs=Minimal SPIFFS (Large APPS with OTA)
+//    esp32cam.menu.PartitionScheme.min_spiffs.build.partitions=min_spiffs
+//    esp32cam.menu.PartitionScheme.min_spiffs.upload.maximum_size=1966080
+// or edit boards.txt
+// esp32cam.upload.maximum_size=1966080
+// esp32cam.build.partitions=min_spiffs
+
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <ArduinoOTA.h>
@@ -34,10 +50,11 @@ String sta_password = "kakadubkorela";   // set password for Wifi network
 #define PCLK_GPIO_NUM     22
 
 /* Defining motor and servo pins */
-extern int DRV_A = 12;
-extern int DRV_B = 13;
-extern int DIR_A = 14;
-extern int DIR_B = 15;
+extern int MOTOR_L_F = 12; // left motor Forward
+extern int MOTOR_L_B = 13; // left motor Backward
+extern int MOTOR_R_B = 14; // right motor Backward
+extern int MOTOR_R_F = 15; // right motor Forward
+
 
 extern int ledVal = 20;  // setting bright of flash LED 0-255
 
@@ -67,20 +84,20 @@ void setup() {
   Serial.println("--------------------------------------------------------");
 
   // Set all the motor control pin to Output
-  pinMode(DRV_A, OUTPUT);
-  pinMode(DRV_B, OUTPUT);
-  pinMode(DIR_A, OUTPUT);
-  pinMode(DIR_B, OUTPUT);
+  pinMode(MOTOR_L_F, OUTPUT);
+  pinMode(MOTOR_L_B, OUTPUT);
+  pinMode(MOTOR_R_B, OUTPUT);
+  pinMode(MOTOR_R_F, OUTPUT);
 
   pinMode(ledPin, OUTPUT); // set the LED pin as an Output
   pinMode(buzzerPin, OUTPUT); // set the buzzer pin as an Output
   pinMode(servoPin, OUTPUT); // set the servo pin as an Output
 
   // Initial state - turn off motors, LED & buzzer
-  digitalWrite(DRV_A, LOW);
-  digitalWrite(DRV_B, LOW);
-  digitalWrite(DIR_A, LOW);
-  digitalWrite(DIR_B, LOW);
+  digitalWrite(MOTOR_L_F, LOW);
+  digitalWrite(MOTOR_L_B, LOW);
+  digitalWrite(MOTOR_R_B, LOW);
+  digitalWrite(MOTOR_R_F, LOW);
   digitalWrite(ledPin, LOW);
   digitalWrite(buzzerPin, LOW);
   digitalWrite(servoPin, LOW);
@@ -186,7 +203,32 @@ void setup() {
   Serial.print(myIP);
   Serial.println("' to connect ");
 
+  // OTA
+  ArduinoOTA
+    .onStart([]() {
+      String type;
+      if (ArduinoOTA.getCommand() == U_FLASH)
+        type = "sketch";
+      else // U_SPIFFS
+        type = "filesystem";
 
+      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+      Serial.println("Start updating " + type);
+    })
+    .onEnd([]() {
+      Serial.println("\nEnd");
+    })
+    .onProgress([](unsigned int progress, unsigned int total) {
+      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    })
+    .onError([](ota_error_t error) {
+      Serial.printf("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    });
   ArduinoOTA.begin();   // enable to receive update/upload firmware via Wifi OTA
 }
 

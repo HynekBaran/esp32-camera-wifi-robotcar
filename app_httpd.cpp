@@ -5,10 +5,10 @@
 #include "Arduino.h"
 
 /* Initializing pins */
-extern int DRV_A;
-extern int DRV_B;
-extern int DIR_A;
-extern int DIR_B;
+extern int MOTOR_L_F;
+extern int MOTOR_L_B;
+extern int MOTOR_R_B;
+extern int MOTOR_R_F;
 extern int ledPin;
 extern int buzzerPin;
 extern int servoPin;
@@ -302,90 +302,90 @@ static esp_err_t state_handler(httpd_req_t *req){
 
     if(!strcmp(cmd, "F")) {
       Serial.println("Forward");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, HIGH);
-      digitalWrite(DIR_B, HIGH);
+      digitalWrite(MOTOR_L_F, HIGH);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, HIGH);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "B")) {
       Serial.println("Backward");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, LOW);
-      digitalWrite(DIR_B, LOW);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, HIGH);
+      digitalWrite(MOTOR_R_B, HIGH);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "R")) {
       Serial.println("Turn Right");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, LOW);
-      digitalWrite(DIR_B, HIGH);
+      digitalWrite(MOTOR_L_F, HIGH);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, HIGH);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "L")) {
       Serial.println("Turn Left");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, HIGH);
-      digitalWrite(DIR_B, LOW);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, HIGH);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, HIGH);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "G")) {
       Serial.println("Forward Left");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, LOW);
-      digitalWrite(DIR_A, HIGH);
-      digitalWrite(DIR_B, HIGH);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, HIGH);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "H")) {
       Serial.println("Backward Left");
-      digitalWrite(DRV_A, HIGH);
-      digitalWrite(DRV_B, LOW);
-      digitalWrite(DIR_A, LOW);
-      digitalWrite(DIR_B, LOW);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, HIGH);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "I")) {
       Serial.println("Forward Right");
-      digitalWrite(DRV_A, LOW);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, HIGH);
-      digitalWrite(DIR_B, HIGH);
+      digitalWrite(MOTOR_L_F, HIGH);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "J")) {
       Serial.println("Backward Right");
-      digitalWrite(DRV_A, LOW);
-      digitalWrite(DRV_B, HIGH);
-      digitalWrite(DIR_A, LOW);
-      digitalWrite(DIR_B, LOW);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, HIGH);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
     
     else if(!strcmp(cmd, "S")) {
       Serial.println("Stop");
-      digitalWrite(DRV_A, LOW);
-      digitalWrite(DRV_B, LOW);
-      digitalWrite(DIR_A, LOW);
-      digitalWrite(DIR_B, LOW);
+      digitalWrite(MOTOR_L_F, LOW);
+      digitalWrite(MOTOR_L_B, LOW);
+      digitalWrite(MOTOR_R_B, LOW);
+      digitalWrite(MOTOR_R_F, LOW);
       httpd_resp_set_type(req, "text/html");
       return httpd_resp_send(req, "OK", 2);
     }
